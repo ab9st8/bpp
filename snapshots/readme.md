@@ -1,0 +1,1 @@
+RAM snapshots taken with the "Debug -> Snapshot RAM" button will be stored in this directory.

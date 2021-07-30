@@ -1,0 +1,11 @@
+name        = "Bytepusher++"
+compiler    = "g++"
+extensions  = [".cpp"]
+outputDir   = "build"
+auxOutput   = true
+ignoreDirs  = [".vscode"]
+ignoreFiles = []
+flags       = ["-Wall", "-std=c++17", "`sdl2-config --cflags --libs`"]
+libs        = []
+includes    = ["include", "lib/imgui/include", "lib/ImGuiFileDialog"]
+linkDirs    = []
