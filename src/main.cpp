@@ -18,7 +18,7 @@
 #define FRAMERATE 60.0f
 #define FRAMELENGTH (MILLISECONDS / FRAMERATE)
 
-int main(int argc, char const *argv[])
+int main(int argc, char** argv)
 {
 	// SDL initialisation
     SDL_Init(SDL_INIT_EVERYTHING);
