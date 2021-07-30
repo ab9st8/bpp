@@ -26,6 +26,20 @@ int main(int argc, char** argv)
 	SDL_Window* window = SDL_CreateWindow("Bytepusher++", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 700, SDL_WINDOW_RESIZABLE);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
+	// There is a bug in ImGui where the background isn't cleared properly on Windows 10.
+	// The workaround is to create a texture with the background color and use that to clear the screen instead
+#ifdef _WIN32
+	SDL_Texture* windowsClearFix = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, 1, 1);
+	Uint8* pixels;
+	int pitch;
+	SDL_LockTexture(windowsClearFix, NULL, (void**)&pixels, &pitch);
+	pixels[0] = 114;
+	pixels[1] = 144;
+	pixels[2] = 154;
+	pixels[3] = 255;
+	SDL_UnlockTexture(windowsClearFix);
+#endif
+
 	// VM initialisation
 	Bus* bus = new Bus();
 
@@ -47,15 +61,6 @@ int main(int argc, char** argv)
 	ImGui::CreateContext();
 	ImGuiSDL::Initialize(renderer, 900, 700);
     ImGui::StyleColorsDark();
-
-	// Clears screen
-	SDL_Texture* clear = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, 100, 100);
-	{
-		SDL_SetRenderTarget(renderer, clear);
-		SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
-		SDL_RenderClear(renderer);
-		SDL_SetRenderTarget(renderer, nullptr);
-	}
 
 	std::time_t res = std::time(nullptr);
 	std::string date = std::ctime(&res);
@@ -216,7 +221,12 @@ int main(int argc, char** argv)
 		ImGui::End();
 
 		SDL_SetRenderDrawColor(renderer, 114, 144, 154, 255);
+
+#ifdef _WIN32
+		SDL_RenderCopy(renderer, windowsClearFix, NULL, NULL);
+#else
 		SDL_RenderClear(renderer);
+#endif
 
 		ImGui::Render();
 		ImGuiSDL::Render(ImGui::GetDrawData());
@@ -231,10 +241,6 @@ int main(int argc, char** argv)
 
 	ImGuiSDL::Deinitialize();
 
-	SDL_DestroyTexture(clear);
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
-
     delete cpu;
 	delete memory;
 	delete display;
@@ -242,6 +248,12 @@ int main(int argc, char** argv)
 
 	delete bus;
 	ImGui::DestroyContext();
+
+#ifdef _WIN32
+	SDL_DestroyTexture(windowsClearFix);
+#endif
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
 	
 	return EXIT_SUCCESS;
 }
