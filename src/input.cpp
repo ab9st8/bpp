@@ -14,8 +14,8 @@ void Input::HandleKeyDown(SDL_Keycode keycode)
     switch (keycode)
     {
     case SDLK_1: this->SetKeyBit(1); break;
-	case SDLK_2: this->SetKeyBit(2); break;
-	case SDLK_3: this->SetKeyBit(3); break;
+    case SDLK_2: this->SetKeyBit(2); break;
+    case SDLK_3: this->SetKeyBit(3); break;
     case SDLK_4: this->SetKeyBit(12); break;
     case SDLK_q: this->SetKeyBit(4); break;
     case SDLK_w: this->SetKeyBit(5); break;
