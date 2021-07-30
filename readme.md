@@ -11,7 +11,7 @@ I tried to document best to my abilities how each component works in its respect
 You can take snapshots of the RAM with the "Debug -> Snapshot RAM" button. They will be saved to the "snapshots" directory in the project and will be named with the format `<date of VM bootup>: <number of snapshot>.bytepusher`.
 
 ## Building and running
-You can build the project using [Click](https://github.com/c1m5j/click), a one-command C/C++ build tool made by me. Once you're in the project directory just run `click`. The binary will be outputted to the "build" directory (unless you specify a different one in click.toml).
+You can build the project using either CMake or [Click](https://github.com/c1m5j/click), a one-command C/C++ build tool made by me. Once you're in the project directory just run `click`. The binary will be outputted to the "build" directory (unless you specify a different one in click.toml).
 
 Run the binary without any console arguments, because the ROMs are loaded in the interface using a file dialog (ImGuiFileDialog by aiekick).
 
