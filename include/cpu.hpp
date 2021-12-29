@@ -20,8 +20,6 @@ public:
 
     void Step();
     void Reset();
-    void setKeyBit(uint8_t index);
-    void clearKeyBit(uint8_t index);
 
 private:
     Bus* bus;

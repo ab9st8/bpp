@@ -3,7 +3,7 @@
 #include "memory.hpp"
 
 // i'm sorry but there's no way i'm typing this every time i want to access memory
-// (which is a lot of times in this file)
+// (which is relatively a lot of times in this file)
 #define MEMORY this->bus->memory->mem
 
 CPU::CPU(Bus* bus): bus(bus)
@@ -31,19 +31,4 @@ void CPU::Reset()
     this->pc = MEMORY + ((uint32_t)MEMORY[2]<<16 | (uint32_t)MEMORY[3]<<8 | MEMORY[4]);
 }
 
-void CPU::setKeyBit(uint8_t index)
-{
-    uint32_t* keyboard = (uint32_t*)MEMORY;
-    if (index < 8) *keyboard |= 1 << (index + 8);
-    else *keyboard |= 1 << (index - 8);
-}
-
-void CPU::clearKeyBit(uint8_t index)
-{
-    uint32_t* keyboard = (uint32_t*)MEMORY;
-    if (index < 8) *keyboard &= ~(1 << (index + 8));
-    else *keyboard &= ~(1 << (index - 8));
-}
-
-#undef MEMORY
-// goodbye
+#undef MEMORY // goodbye

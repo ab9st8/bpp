@@ -18,6 +18,9 @@
 #define FRAMERATE 60.0f
 #define FRAMELENGTH (MILLISECONDS / FRAMERATE)
 
+#define RED ImVec4(1.0f, 0.0f, 0.0f, 1.0f)
+#define GRAY ImVec4(0.5f, 0.5f, 0.5f, 1.0f)
+
 int main(int argc, char** argv)
 {
 	// SDL initialisation
@@ -46,7 +49,7 @@ int main(int argc, char** argv)
 	Memory* memory = new Memory(bus);
 	bus->memory = memory;
 
-    CPU* cpu = new CPU(bus);
+	CPU* cpu = new CPU(bus);
 	bus->cpu = cpu;
 
 	Display* display = new Display(bus, renderer);
@@ -60,7 +63,7 @@ int main(int argc, char** argv)
 
 	ImGui::CreateContext();
 	ImGuiSDL::Initialize(renderer, 900, 700);
-    ImGui::StyleColorsDark();
+	ImGui::StyleColorsDark();
 
 	std::time_t res = std::time(nullptr);
 	std::string date = std::ctime(&res);
@@ -126,7 +129,6 @@ int main(int argc, char** argv)
 		// ImGui code
 
 		ImGui::NewFrame();
-		// window minimizers
 
 		if (ImGui::BeginMainMenuBar()) {
 			if (ImGui::BeginMenu("File")) {
@@ -152,22 +154,21 @@ int main(int argc, char** argv)
 				if (ImGui::MenuItem("Snapshot RAM")) {
 					// candidate for ugliest piece of code in history?
 					std::string filepath = std::filesystem::path(argv[0])
-					.parent_path()
-					.parent_path()
-					.string() 
-					+ "/snapshots/" 
-					+ date 
-					+ ": " 
-					+ std::to_string(snapshotIncrement) 
-					+ ".bytepusher";
+						.parent_path()
+						.parent_path()
+						.string() 
+						+ "/snapshots/" 
+						+ date 
+						+ ": " 
+						+ std::to_string(snapshotIncrement++)
+						+ ".bytepusher";
 
 					if (!memory->SnapshotRAM(filepath)) {
 						if (ImGui::BeginPopupModal("RAM snapshotting error")) {
-							ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s", memory->snapshotError.c_str());
+							ImGui::TextColored(RED, "%s", memory->snapshotError.c_str());
 							ImGui::EndPopup();
 						}
 					}
-					snapshotIncrement++;
 				}
 				ImGui::EndMenu();
 			}
@@ -179,7 +180,7 @@ int main(int argc, char** argv)
 				ImGuiFileDialog::Instance()->Close();
 				if (!memory->LoadROM(filePathName)) {
 					if (ImGui::BeginPopupModal("ROM loading error")) {
-						ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s", memory->ROMLoadError.c_str());
+						ImGui::TextColored(RED, "%s", memory->ROMLoadError.c_str());
 						ImGui::EndPopup();
 					}
 				}
@@ -190,26 +191,26 @@ int main(int argc, char** argv)
 			ImGui::Begin("Debug", &showDebug, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize);
 			ImGui::Text("-- ROM info --");
 			if (ImGui::BeginTable("ROM info", 2)) {
-				ImGui::TableNextColumn(); ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "Has loaded ROM");
+				ImGui::TableNextColumn(); ImGui::TextColored(GRAY, "Has loaded ROM");
 				ImGui::TableNextColumn(); ImGui::Text(memory->ROMLoaded? "Yes" : "No");
-				ImGui::TableNextColumn(); ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "ROM name");
+				ImGui::TableNextColumn(); ImGui::TextColored(GRAY, "ROM name");
 				ImGui::TableNextColumn(); ImGui::Text("%s", std::filesystem::path(memory->ROMFilepath).filename().c_str());
-				ImGui::TableNextColumn(); ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "ROM size");
+				ImGui::TableNextColumn(); ImGui::TextColored(GRAY, "ROM size");
 				ImGui::TableNextColumn(); ImGui::Text("%zu B", memory->ROMSize);
-				ImGui::TableNextColumn(); ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "Is paused");
+				ImGui::TableNextColumn(); ImGui::TextColored(GRAY, "Is paused");
 				ImGui::TableNextColumn(); ImGui::Text(paused? "Yes" : "No");
 				ImGui::EndTable();
 			}
 			ImGui::Separator();
 			ImGui::Text("-- Emulation info --");
 			if (ImGui::BeginTable("Emulation info", 2)) {
-				ImGui::TableNextColumn(); ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "Keyboard state");
+				ImGui::TableNextColumn(); ImGui::TextColored(GRAY, "Keyboard state");
 				ImGui::TableNextColumn(); ImGui::Text("%s", std::bitset<16>((uint32_t)memory->mem[0] << 8 | memory->mem[1]).to_string().c_str());
-				ImGui::TableNextColumn(); ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "GFX block location");
+				ImGui::TableNextColumn(); ImGui::TextColored(GRAY, "GFX block location");
 				ImGui::TableNextColumn(); ImGui::Text("0x%02x", memory->mem[5]);
-				ImGui::TableNextColumn(); ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "Sound block location");
+				ImGui::TableNextColumn(); ImGui::TextColored(GRAY, "Sound block location");
 				ImGui::TableNextColumn(); ImGui::Text("0x%06x", (uint32_t)memory->mem[6] << 16 | memory->mem[7] << 8);
-				ImGui::TableNextColumn(); ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "Memory errors");
+				ImGui::TableNextColumn(); ImGui::TextColored(GRAY, "Memory errors");
 				ImGui::TableNextColumn(); ImGui::Text("%s\n%s", memory->ROMLoadError.c_str(), memory->snapshotError.c_str());
 				ImGui::EndTable();
 			}
@@ -241,7 +242,7 @@ int main(int argc, char** argv)
 
 	ImGuiSDL::Deinitialize();
 
-    delete cpu;
+	delete cpu;
 	delete memory;
 	delete display;
 	delete audio;
